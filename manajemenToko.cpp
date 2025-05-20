@@ -21,10 +21,13 @@ void adminMenu(string user);
 bool registerUsers(string &user, string pasw);
 bool loginUsers(string &user, string pasw);
 
+
 void addBook(int tambahBuku);
 void updateBook();
 void listBook();
 void searchBook();
+void sortingBuku();
+void OutputForSort();
 
 // bntr jakl
 //okee
@@ -74,7 +77,8 @@ void mainMenu(){
                                     // =================================================
                                     // menu back
         cout << "[4]. Tambah Buku \n";
-        cout << "[5]. EXIT \n";
+        cout << "[5]. Sorting Buku \n";
+        cout << "[6]. EXIT \n";
         cout << "Input: ";
         cin >> pil;
         switch(pil){
@@ -95,6 +99,10 @@ void mainMenu(){
             break;
 
             case 5:
+            sortingBuku();
+            break;
+
+            case 6:
             exit(0);
             break;
 
@@ -111,6 +119,9 @@ void firstMenu(string &user){
 
     while(true){
         system("cls");
+        cout << "=============================\n";
+        cout << "   SISTEM MANAJEMEN TOKO\n";
+        cout << "=============================\n\n";
         cout << "|| Selamat Datang di GaraMedia ||\n";
         cout << "[1]. Register\n";
         cout << "[2]. Login\n";
@@ -442,6 +453,93 @@ void addBook(int tambahBuku){
     system("cls");
 
     return addBook(tambahBuku - 1);
+}
+
+
+void sortingBuku() {
+    buku daftarBuku[kapasitasBuku];
+    int x = 0;
+
+    ifstream Database(fileListBuku);
+    if (!Database.is_open()) {
+        cout << "File tidak bisa dibuka\n";
+        system("pause");
+        return;
+    }
+
+    while(Database >> daftarBuku[x].idBuku >> daftarBuku[x].judulBuku >> daftarBuku[x].genre
+    >> daftarBuku[x].authorBuku >> daftarBuku[x].penerbitBuku >> daftarBuku[x].tahunTerbit >> daftarBuku[x].harga){
+        daftarBuku[x].judulBuku = UnderscoreToSpace(daftarBuku[x].judulBuku);
+        daftarBuku[x].authorBuku = UnderscoreToSpace(daftarBuku[x].authorBuku);
+        daftarBuku[x].penerbitBuku = UnderscoreToSpace(daftarBuku[x].penerbitBuku);
+        x++;
+    }
+    Database.close();
+
+    if(x == 0){
+        cout << "Tidak ada data untuk diurutkan. \n";
+        system("pause");
+        return;
+    }
+
+    int pilih;
+    cout << "Urutkan berdasarkan:\n";
+    cout << "1. Judul Buku \n";
+    cout << "2. Harga Buku \n";
+    cout << "Pilihan: ";
+    cin >> pilih;
+
+    for(int i = 0; i < x - 1;i++){
+        for(int j = 0 ; j < x - i - 1; j++){
+            bool tukar = false;
+            if(pilih == 1 && daftarBuku[j].judulBuku > daftarBuku[j+1].judulBuku ){
+                tukar = true;
+            }else if(pilih == 2 && daftarBuku[j].harga > daftarBuku[j+1].harga){
+                tukar = true;
+            }
+
+            if(tukar){
+                buku temp = daftarBuku[j];
+                daftarBuku[j] = daftarBuku[j+1];
+                daftarBuku[j+1] = temp;
+            }
+        }
+    }
+
+    //simpan data yg udah diurutkan ke file
+    ofstream SaveFile(fileListBuku);
+    for(int i = 0; i < x; i++){
+        SaveFile << (daftarBuku[i].idBuku) << " " << spaceToUnderscore(daftarBuku[i].judulBuku) <<" " << daftarBuku[i].genre << " " 
+        << spaceToUnderscore(daftarBuku[i].authorBuku) << " " << spaceToUnderscore(daftarBuku[i].penerbitBuku)<< " " <<
+        daftarBuku[i].tahunTerbit << " " << daftarBuku[i].harga << endl;
+    }
+    SaveFile.close();
+    OutputForSort();
+    cout << "Data telah berhasil diurutkan dan disimpan pada file\n";
+    system("pause");
+}
+
+void OutputForSort(){
+    ifstream Database(fileListBuku);
+    if(!Database.is_open()){
+        cout << "File tidak ada \n";
+    }
+    int i = 1;
+    string id,judul,genre1,penulis,penerbit1,tahun;
+    int harga1;
+    
+    while(Database >> id >> judul >> genre1 >> penulis >> penerbit1 >> tahun >> harga1){
+        judul = UnderscoreToSpace(judul);
+        penulis = UnderscoreToSpace(penulis);
+        penerbit1 = UnderscoreToSpace(penerbit1);
+        cout << "Buku ke-" << i << endl;
+        cout << "ID \t : " << id << endl;
+        cout << "Judul \t : " << judul << endl;
+        cout << "Penulis  : " << penulis << endl;
+        cout << "Harga \t : " << harga1 << endl;
+        i++;
+    }
+    Database.close();
 }
 
 bool loginUsers(string &user, string pasw){
