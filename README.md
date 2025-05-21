@@ -11,6 +11,6 @@
 
 ## Description
 
-Program ini merupakan tugas akhir dari **Praktikum Algoritma dan Pemrograman Lanjut Kelas IF-D UPNVY** yang terdiri atas 2 anggota. Program ini memiliki berbagai macam fitur seperti sorting, searching dan sebagaina. Program ini menggunakan bahasa pemrograman **C++**.
+Program ini merupakan tugas akhir dari **Praktikum Algoritma dan Pemrograman Lanjut Kelas IF-D UPNVY** yang terdiri atas 2 anggota. Program ini memiliki berbagai macam fitur seperti sorting, searching dan sebagainya. Program ini menggunakan bahasa pemrograman **C++**.
 
 ---
