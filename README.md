@@ -5,6 +5,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/kuraakenu/manajementoko?style=flat-square)
 
 > Praktikum Algoritma dan Pemrograman Lanjut IF-D UPNVY — Manajemen Toko Buku
+
 > by **Kuraakenu** and **Mahfuzii**
 
 ---
