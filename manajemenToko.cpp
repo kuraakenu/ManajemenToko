@@ -52,6 +52,7 @@ void mainMenu(){
     firstMenu(user);
     
     int pil, newBook, tambahBuku;
+    pil = 0;
     while(pil != 6){
         system("cls");
         cout << "Hai Admin "<< user << "! \n";
@@ -98,7 +99,7 @@ void mainMenu(){
 }
 
 void firstMenu(string &user){
-    int pil;
+    int pil = 0;
     string pasw;
 
     while(true){
@@ -183,7 +184,7 @@ void updateBook(){
         count++;
     }
     fileCheck.close();
-
+    pil = 0;
     while(pil != 3){
         ofstream fileTemp("tempList.txt");
         system("cls");
@@ -203,33 +204,33 @@ void updateBook(){
                     if(idTemp == daftarBuku[i].idBuku){
                         cin.ignore();
                         cout << "--------------------------------\n";
-                        cout << "Masukkan Judul Baru: ";
+                        cout << "Masukkan Judul Baru        : ";
                         getline(cin, judulTemp);
                         judulTemp = EditUpLowCase(judulTemp);
                         judulTemp = spaceToUnderscore(judulTemp);
 
-                        cout << "Masukkan Genre Baru: ";
+                        cout << "Masukkan Genre Baru        : ";
                         getline(cin, genreTemp);
                         genreTemp = EditUpLowCase(genreTemp);
                         genreTemp = spaceToUnderscore(genreTemp);
 
-                        cout << "Masukkan Author Baru: ";
+                        cout << "Masukkan Author Baru       : ";
                         getline(cin, authorTemp);
                         authorTemp = EditUpLowCase(authorTemp);
                         authorTemp = spaceToUnderscore(authorTemp);
 
-                        cout << "Masukkan Penerbit Baru: ";
+                        cout << "Masukkan Penerbit Baru     : ";
                         getline(cin, penerbitTemp);
                         penerbitTemp = EditUpLowCase(penerbitTemp);
                         penerbitTemp = spaceToUnderscore(penerbitTemp);
 
-                        cout << "Masukkan Tahun Terbit Baru: ";
+                        cout << "Masukkan Tahun Terbit Baru : ";
                         cin >> tahunTemp;
 
-                        cout << "Masukkan Harga Baru: ";
+                        cout << "Masukkan Harga Baru        : ";
                         cin >> hargaTemp;
 
-                        cout << "Masukkan Stok Baru: ";
+                        cout << "Masukkan Stok Baru         : ";
                         cin >> stokTemp;
 
                         fileTemp << idTemp << ' ' << judulTemp << ' ' << genreTemp << ' ' << authorTemp << ' ' << penerbitTemp << ' ' << tahunTemp << ' ' << hargaTemp << ' ' << stokTemp << '\n';
@@ -377,7 +378,7 @@ void searchBook(){
         i++;
     }
     fileCheck.close();
-    int pil;
+    int pil = 0;
     while(pil != 3){
         system("cls");
         cout << "Cari Buku di Gudang\n";
@@ -586,8 +587,8 @@ void sortingBuku() {
         system("pause");
         return;
     }
-    int pilih;
-    while(pilih != 3){
+    int pil = 0;
+    while(pil != 3){
         bool swap = false;
         system("cls"); 
         cout << "Urutkan Berdasarkan:\n";
@@ -595,9 +596,9 @@ void sortingBuku() {
         cout << "[2]. Harga Buku \n";
         cout << "[3]. BACK\n";
         cout << "Input: ";
-        cin >> pilih;
+        cin >> pil;
     
-        switch(pilih){
+        switch(pil){
             case 1:
                 for(int i = 0; i < x - 1;i++){
                     for(int j = 0 ; j < x - i - 1; j++){
@@ -631,8 +632,6 @@ void sortingBuku() {
                 swap = true;
             break;
             case 3:
-                cout << "Kembali ke menu sebelumnya \n";
-                system("pause");
                 return;
             break;
             default:

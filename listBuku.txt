@@ -8,10 +8,11 @@ B009 Ceros_dan_Batozar Fiksi_Fantasi Tere_Liye Kepustakaan_Populer_Gramedia 2018
 B010 Komet Fiksi_Fantasi Tere_Liye Kepustakaan_Populer_Gramedia 2018 84000 10
 B011 Komet_Minor Fantasi_Romantis Tere_Liye Kepustakaan_Populer_Gramedia 2019 105000 15
 B004 Laskar_Pelangi Fiksi Andrea_Hirata Kepustakaan_Populer_Gramedia 2005 89000 10
-B001 Laut_Bercerita Fiksi Leila_S.Chudori Kepustakaan_Populer_Gramedia 2017 98000 7
+B001 Laut_Bercerita Fiksi Leila_S.Chudori Kepustakaan_Populer_Gramedia 2017 98000 18
 B015 Lumpu Fiksi Tere_Liye Kepustakaan_Populer_Gramedia 2020 102000 10
 B007 Matahari Fiksi Tere_Liye Kepustakaan_Populer_Gramedia 2016 109000 10
 B013 Nebula Fiksi_Petualangan Tere_Liye Kepustakaan_Populer_Gramedia 2019 85000 10
 B017 Sagaras Fiksi Tere_Liye Kepustakaan_Populer_Gramedia 2022 102000 10
 B012 Selena Fiksi_Petualangan Tere_Liye Kepustakaan_Gramedia 2020 85000 10
 B014 Si_Putih Fiksi Tere_Liye Kepustakaan_Populer_Gramedia 2020 85000 10
+B018 The_Midnight_Library Fiksi Matt_Haig Canongate_Books 2020 109000 12
