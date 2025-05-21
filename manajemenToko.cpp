@@ -56,7 +56,7 @@ void mainMenu(){
     while(pil != 6){
         system("cls");
         cout << "Hai Admin "<< user << "! \n";
-        cout << "Selamat Datang di Dashboard Toko Buku Online\n";
+        cout << "Selamat Datang di Dashboard Toko Buku\n";
         cout << "[1]. Update Data Buku\n";
         cout << "[2]. List Buku\n";
         cout << "[3]. Cari Buku\n"; 
