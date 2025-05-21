@@ -678,6 +678,7 @@ void OutputForSort(){
         cout << "Penulis    : " << penulis << endl;
         cout << "Harga      : " << harga1 << endl;
         cout << "Stok       : " << stok << '\n';
+        cout << '\n';
         i++;
     }
     Database.close();
