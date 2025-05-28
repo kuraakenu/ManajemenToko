@@ -19,13 +19,14 @@ void firstMenu(string &user);
 bool registerUsers(string &user, string pasw);
 bool loginUsers(string &user, string pasw);
 
-void updateBook();
-void listBook();
-void searchBook();
-void addBook(int tambahBuku);
-void sortingBuku();
+void updateBook(int jumlahBuku);
+void listBook(int jumlahBuku);
+void searchBook(int jumlahBuku);
+void addBook(int tambahBuku, int jumlahBuku);
+void sortingBuku(int jumlahBuku);
 void OutputForSort();
 void updateStock(int *a, int *b);
+void fileLoader(int *a);
 
 struct buku{
     string idBuku;
@@ -45,15 +46,51 @@ int main(){
     return 0;
 }
 
+void fileLoader(int *a){
+    // klo gada file, membuat file
+    ifstream fileCheck(fileListBuku);
+    if(!fileCheck.is_open()){
+        ofstream fileCreate(fileListBuku);
+        fileCreate.close();
+    }
+    fileCheck.close();
+
+    ifstream fileLoad(fileListBuku);
+    string judulTemp, idTemp, authorTemp, penerbitTemp, tahunTemp, genreTemp;
+    int i = 0;
+    int hargaInt, stokInt;
+    while(fileLoad >> idTemp >> judulTemp >> genreTemp >> authorTemp >> penerbitTemp >> tahunTemp >> hargaInt >> stokInt){
+        judulTemp = UnderscoreToSpace(judulTemp);
+        genreTemp = UnderscoreToSpace(genreTemp);
+        authorTemp = UnderscoreToSpace(authorTemp);
+        penerbitTemp = UnderscoreToSpace(penerbitTemp);
+
+        daftarBuku[i].idBuku = idTemp;
+        daftarBuku[i].judulBuku = judulTemp;
+        daftarBuku[i].genre = genreTemp;
+        daftarBuku[i].authorBuku = authorTemp;
+        daftarBuku[i].penerbitBuku = penerbitTemp;
+        daftarBuku[i].tahunTerbit = tahunTemp;
+        daftarBuku[i].harga = hargaInt;
+        daftarBuku[i].stok = stokInt;
+        i++;
+    }
+
+    fileLoad.close();
+    *a = i;
+}
+
 void mainMenu(){
 
     string user;
     int mode = 0;
     firstMenu(user);
     
-    int pil, newBook, tambahBuku;
+    int pil, tambahBuku;
     pil = 0;
+    int jumlahBuku = 0;
     while(pil != 6){
+        fileLoader(&jumlahBuku);
         system("cls");
         cout << "Hai Admin "<< user << "! \n";
         cout << "Selamat Datang di Dashboard Toko Buku\n";
@@ -67,26 +104,52 @@ void mainMenu(){
         cin >> pil;
         switch(pil){
             case 1:
-                updateBook();
+                if(jumlahBuku == 0){
+                    cout << "Tidak Ada Buku! Tambahkan Dulu!\n";
+                    system("pause");
+                }else{
+                    updateBook(jumlahBuku);
+                }
             break;
             case 2:
-                listBook();
+                if(jumlahBuku == 0){
+                    cout << "Tidak Ada Buku! Tambahkan Dulu!\n";
+                    system("pause");
+                }else{
+                    listBook(jumlahBuku);
+                }
             break;
             case 3:
-                searchBook();
+                if(jumlahBuku == 0){
+                    cout << "Tidak Ada Buku! Tambahkan Dulu!\n";
+                    system("pause");
+                }else{
+                    searchBook(jumlahBuku);
+                }
             break;
             case 4:
             system("cls");
                 cout << "Jumlah Buku Yang Ingin Ditambahkan: ";
                 cin >> tambahBuku;
-                addBook(tambahBuku);
+                if(tambahBuku <= 0){
+                    cout << "Jumlah Buku Harus >= 1!\n";
+                    system("pause");
+                }else{
+                    addBook(tambahBuku, jumlahBuku);
+                }
             break;
 
             case 5:
-                sortingBuku();
+                if(jumlahBuku == 0){
+                    cout << "Tidak Ada Buku! Tambahkan Dulu!\n";
+                    system("pause");
+                }else{
+                    sortingBuku(jumlahBuku);
+                }
             break;
 
             case 6:
+                cout << "Bye!\n";
                 exit(0);
             break;
 
@@ -154,39 +217,15 @@ void firstMenu(string &user){
     }
 }
 
-void updateBook(){
-    ifstream fileCheck(fileListBuku);
+void updateBook(int jumlahBuku){
 
-    if(!fileCheck.is_open()){
-        cout << "File Error!\n";
-        system("pause");
-        return;
-    }
-
-    string idTemp, judulTemp, authorTemp, penerbitTemp, genreTemp, tahunTemp, updated;
-    int hargaTemp, stokTemp, stokTambah, pil, count;
     bool done = false;
-    count = 0;
+    string idTemp, updated, judulTemp;
+    int stokUbah = 0;
 
-    while(fileCheck >> idTemp >> judulTemp >> genreTemp >> authorTemp >> penerbitTemp >> tahunTemp >> hargaTemp >> stokTemp){
-        judulTemp = UnderscoreToSpace(judulTemp);
-        genreTemp = UnderscoreToSpace(genreTemp);
-        authorTemp = UnderscoreToSpace(authorTemp);
-        penerbitTemp = UnderscoreToSpace(penerbitTemp);
-        daftarBuku[count].idBuku = idTemp;
-        daftarBuku[count].judulBuku = judulTemp;
-        daftarBuku[count].genre = genreTemp;
-        daftarBuku[count].authorBuku = authorTemp;
-        daftarBuku[count].penerbitBuku = penerbitTemp;
-        daftarBuku[count].tahunTerbit = tahunTemp;
-        daftarBuku[count].harga = hargaTemp;
-        daftarBuku[count].stok = stokTemp;
-        count++;
-    }
-    fileCheck.close();
-    pil = 0;
+    int pil = 0;
+    ofstream fileTemp(fileListBuku, ios::trunc);
     while(pil != 3){
-        ofstream fileTemp("tempList.txt");
         system("cls");
         cout << "[1]. Update Keseluruhan\n";
         cout << "[2]. Update Stok\n";
@@ -200,52 +239,53 @@ void updateBook(){
                 cout << "Masukkan ID Buku: ";
                 cin >> idTemp;
                 updated = idTemp;
-                for(int i = 0; i < count; i++){
+                for(int i = 0; i < jumlahBuku; i++){
                     if(idTemp == daftarBuku[i].idBuku){
                         cin.ignore();
                         cout << "--------------------------------\n";
                         cout << "Masukkan Judul Baru        : ";
-                        getline(cin, judulTemp);
-                        judulTemp = EditUpLowCase(judulTemp);
-                        judulTemp = spaceToUnderscore(judulTemp);
+                        getline(cin, daftarBuku[i].idBuku);
+                        daftarBuku[i].judulBuku = EditUpLowCase(daftarBuku[i].judulBuku);
+                        daftarBuku[i].judulBuku= spaceToUnderscore(daftarBuku[i].judulBuku);
 
                         cout << "Masukkan Genre Baru        : ";
-                        getline(cin, genreTemp);
-                        genreTemp = EditUpLowCase(genreTemp);
-                        genreTemp = spaceToUnderscore(genreTemp);
+                        getline(cin, daftarBuku[i].genre);
+                        daftarBuku[i].genre = EditUpLowCase(daftarBuku[i].genre);
+                        daftarBuku[i].genre = spaceToUnderscore(daftarBuku[i].genre);
 
                         cout << "Masukkan Author Baru       : ";
-                        getline(cin, authorTemp);
-                        authorTemp = EditUpLowCase(authorTemp);
-                        authorTemp = spaceToUnderscore(authorTemp);
+                        getline(cin, daftarBuku[i].authorBuku);
+                        daftarBuku[i].authorBuku = EditUpLowCase(daftarBuku[i].authorBuku);
+                        daftarBuku[i].authorBuku = spaceToUnderscore(daftarBuku[i].authorBuku);
 
                         cout << "Masukkan Penerbit Baru     : ";
-                        getline(cin, penerbitTemp);
-                        penerbitTemp = EditUpLowCase(penerbitTemp);
-                        penerbitTemp = spaceToUnderscore(penerbitTemp);
+                        getline(cin, daftarBuku[i].penerbitBuku);
+                        daftarBuku[i].penerbitBuku = EditUpLowCase(daftarBuku[i].penerbitBuku);
+                        daftarBuku[i].penerbitBuku = spaceToUnderscore(daftarBuku[i].penerbitBuku);
 
                         cout << "Masukkan Tahun Terbit Baru : ";
-                        cin >> tahunTemp;
+                        cin >> daftarBuku[i].tahunTerbit;
 
                         cout << "Masukkan Harga Baru        : ";
-                        cin >> hargaTemp;
+                        cin >> daftarBuku[i].harga;
 
                         cout << "Masukkan Stok Baru         : ";
-                        cin >> stokTemp;
+                        cin >> daftarBuku[i].stok;
 
-                        fileTemp << idTemp << ' ' << judulTemp << ' ' << genreTemp << ' ' << authorTemp << ' ' << penerbitTemp << ' ' << tahunTemp << ' ' << hargaTemp << ' ' << stokTemp << '\n';
+                        fileTemp << daftarBuku[i].idBuku << ' ' << daftarBuku[i].judulBuku << ' ' << daftarBuku[i].genre << ' ' << daftarBuku[i].authorBuku << ' ' << daftarBuku[i].penerbitBuku << ' ' << daftarBuku[i].tahunTerbit << ' ' << daftarBuku[i].harga << ' ' << daftarBuku[i].stok  << '\n';
                     }else{
-                        fileTemp << daftarBuku[i].idBuku << ' ' << spaceToUnderscore(daftarBuku[i].judulBuku) << ' ' << spaceToUnderscore(daftarBuku[i].genre) << ' ' << spaceToUnderscore(daftarBuku[i].authorBuku) << ' ' << spaceToUnderscore(daftarBuku[i].penerbitBuku) << ' ' << daftarBuku[i].tahunTerbit << ' ' <<daftarBuku[i].harga << ' ' << daftarBuku[i].stok << '\n';
+                        fileTemp << daftarBuku[i].idBuku << ' ' << spaceToUnderscore(daftarBuku[i].judulBuku) << ' ' << spaceToUnderscore(daftarBuku[i].genre) << ' ' << spaceToUnderscore(daftarBuku[i].authorBuku) << ' ' << spaceToUnderscore(daftarBuku[i].penerbitBuku) << ' ' << daftarBuku[i].tahunTerbit << ' ' << daftarBuku[i].harga << ' ' << daftarBuku[i].stok << '\n';
                     }
                 }
                 done = true;
+                fileTemp.close();
             break;
             case 2:
                 system("cls");
                 cout << "Masukkan ID Buku: ";
                 cin >> idTemp;
                 updated = idTemp;
-                for(int i = 0; i < count; i++){
+                for(int i = 0; i < jumlahBuku; i++){
                     if(idTemp == daftarBuku[i].idBuku){
                         system("cls");
                         cout << "=================================================\n";
@@ -260,9 +300,9 @@ void updateBook(){
                         cout << "=================================================\n";
                         cout << "-\n";
                         cout << "Input Stok Baru: ";
-                        cin >> stokTambah;
+                        cin >> stokUbah;
 
-                        updateStock(&stokTambah, &daftarBuku[i].stok);
+                        updateStock(&stokUbah, &daftarBuku[i].stok);
 
                         fileTemp << daftarBuku[i].idBuku << ' ' << spaceToUnderscore(daftarBuku[i].judulBuku) << ' ' << spaceToUnderscore(daftarBuku[i].genre) << ' ' << spaceToUnderscore(daftarBuku[i].authorBuku) << ' ' << spaceToUnderscore(daftarBuku[i].penerbitBuku) << ' ' << daftarBuku[i].tahunTerbit << ' ' <<daftarBuku[i].harga << ' ' << daftarBuku[i].stok << '\n';
                     }else{
@@ -270,10 +310,13 @@ void updateBook(){
                     }
                 }
                 done = true;
+                fileTemp.close();
             break;
             case 3:
+                for(int i = 0; i < jumlahBuku; i++){
+                    fileTemp << daftarBuku[i].idBuku << ' ' << spaceToUnderscore(daftarBuku[i].judulBuku) << ' ' << spaceToUnderscore(daftarBuku[i].genre) << ' ' << spaceToUnderscore(daftarBuku[i].authorBuku) << ' ' << spaceToUnderscore(daftarBuku[i].penerbitBuku) << ' ' << daftarBuku[i].tahunTerbit << ' ' << daftarBuku[i].harga << ' ' << daftarBuku[i].stok << '\n';
+                }
                 fileTemp.close();
-                remove("tempList.txt");
                 return;
             break;
             default:
@@ -285,8 +328,7 @@ void updateBook(){
 
         if(done){
             fileTemp.close();
-            remove(fileListBuku.c_str());
-            rename("tempList.txt", fileListBuku.c_str());
+            string genreTemp, authorTemp, penerbitTemp, tahunTemp, hargaTemp, stokTemp;
 
             ifstream fileCheck(fileListBuku);
             system("cls");
@@ -319,65 +361,20 @@ void updateStock(int *a, int *b){
     *b = *a;
 }
 
-void listBook(){
-    ifstream fileCheck(fileListBuku);
-    string judulTemp, idTemp, authorTemp, penerbitTemp, tahunTemp, hargaTemp, genreTemp, stokTemp;
-    if(!fileCheck.is_open()){
-        cout << "-\n";
-        cout << "File Error!\n";
-        system("pause");
-        return;
-    }
-    int i = 1;
+void listBook(int jumlahBuku){
     system("cls");
-    cout << "List Judul Buku Di Gudang\n";
-    cout << "--------------------------------\n";
-    while(fileCheck >> idTemp >> judulTemp >> genreTemp >> authorTemp >> penerbitTemp >> tahunTemp >> hargaTemp >> stokTemp){
-        judulTemp = UnderscoreToSpace(judulTemp);
-        cout << i << ". "<< judulTemp << '\n';
-        i++;
+    cout << string(65, '=') << '\n';
+    cout << left << setw(15) << "ID" << setw(25) << "Judul" << setw(15) << "Stok" << setw(15) << "Harga" << '\n';
+    cout << string(65, '=') << '\n';
+    for(int f = 0; f < jumlahBuku; f++){
+        cout << left << setw(15) << daftarBuku[f].idBuku << setw(25) << daftarBuku[f].judulBuku << setw(15) << daftarBuku[f].stok << setw(15) << daftarBuku[f].harga << '\n';
     }
-    cout << "--------------------------------\n";
-    fileCheck.close();
+    cout << string(65, '=') << '\n';
     system("pause");
 }
 
-void searchBook(){
-    ifstream fileCheck(fileListBuku);
-    string lineCheck;
-    int count = 0;
-    if(!fileCheck.is_open()){
-        cout << "File Error!\n";
-        system("pause");
-        return;
-    }
+void searchBook(int jumlahBuku){
 
-    while(getline(fileCheck, lineCheck)){
-            count += 1;
-    }
-    fileCheck.close();
-
-    fileCheck.open(fileListBuku);
-    string judulTemp, idTemp, authorTemp, penerbitTemp, tahunTemp, hargaTemp, genreTemp, stokTemp;
-    int i = 0;
-    int hargaInt = 0;
-    int stokInt = 0;
-    while(fileCheck >> idTemp >> judulTemp >> genreTemp >> authorTemp >> penerbitTemp >> tahunTemp >> hargaTemp >> stokTemp){
-        judulTemp = UnderscoreToSpace(judulTemp);
-        genreTemp = UnderscoreToSpace(genreTemp);
-        authorTemp = UnderscoreToSpace(authorTemp);
-        penerbitTemp = UnderscoreToSpace(penerbitTemp);
-        daftarBuku[i].idBuku = idTemp;
-        daftarBuku[i].judulBuku = judulTemp;
-        daftarBuku[i].genre = genreTemp;
-        daftarBuku[i].authorBuku = authorTemp;
-        daftarBuku[i].penerbitBuku = penerbitTemp;
-        daftarBuku[i].tahunTerbit = tahunTemp;
-        daftarBuku[i].harga = hargaInt;
-        daftarBuku[i].stok = stokInt;
-        i++;
-    }
-    fileCheck.close();
     int pil = 0;
     while(pil != 3){
         system("cls");
@@ -390,31 +387,30 @@ void searchBook(){
         cin >> pil;
         string stringCari;
         bool found;
-        int i, x, j;
-        x = count + 1;
+        int i, j;
         int hitung = 0;
         
         switch(pil){
             case 1:
-                daftarBuku[count].judulBuku;
                 cout << "-\n";
                 cout << "Masukkan Judul: ";
                 cin.ignore();
                 getline(cin, stringCari);
                 stringCari = EditUpLowCase(stringCari);
-                daftarBuku[x];
+
                 found = false;
                 i = 0;
 
-                while(!found && i <= count){
+                while(i <= jumlahBuku){
                     if(daftarBuku[i].judulBuku == stringCari){
                         found = true;
+                        break;
                     }else{
                         i++;
                     }
                 }
 
-                if(i < x){
+                if(found){
                     system("cls");
                     cout << "Buku Ditemukan!\n";
                     cout << "-\n";
@@ -439,7 +435,6 @@ void searchBook(){
             break;
 
             case 2: 
-                daftarBuku[count].genre;
                 cout << "-\n";
                 cout << "Masukkan Genre: ";
                 cin.ignore();
@@ -451,7 +446,7 @@ void searchBook(){
                 cout << "Buku Dengan Genre " << stringCari << '\n';
                 cout << "-\n";
 
-                for(i = 0; i < count; i++){
+                for(i = 0; i < jumlahBuku; i++){
                     if(daftarBuku[i].genre == stringCari){
                         found = true;
                         cout << j << ". " << daftarBuku[i].judulBuku << '\n';
@@ -461,7 +456,7 @@ void searchBook(){
 
                 cout << "-\n";
 
-                if(found == false){
+                if(!found){
                     system("cls");
                     cout << "Kita Belum Memiliki Buku Dengan Genre " << stringCari << '\n';
                     cout << "-\n";
@@ -485,43 +480,80 @@ void searchBook(){
 
 }
 
-void addBook(int tambahBuku){
+void addBook(int tambahBuku, int jumlahBuku){
     ofstream fileInput(fileListBuku, ios::app);
-    string judulTemp, penerbitTemp, authorTemp, genreTemp, lineCheck;
-    
-    int num = 1;
-    int count = 1;
+    string judulTemp, penerbitTemp, authorTemp, genreTemp, lineCheck, idTemp;
+    int stokTemp;
 
+    // Cek Apakah file ada atau tidak / terbuka atau tidak
     if(!fileInput.is_open()){
         cout << "File Error!\n";
         system("pause");
         return;
     }
-    
+
+    // karna rekursi, tambahBuku akan terus berkurang sampai 0
     if(tambahBuku == 0){
-        ifstream fileCheck(fileListBuku);
-        while(getline(fileCheck, lineCheck)){
-            count += 1;
+        fileInput.close();
+        int count = 1;
+        ifstream fileCount(fileListBuku);
+        while(getline(fileCount, lineCheck)){ // cara kerjanya, getline akan baca kata dari fileCount sampai ke baris akhir, kalau ketemu newline di linecheck=0 maka linecheck +1, baca baris selanjutnya di linecheck = 1 dan seterusnya
+            count++;
         }
+        fileCount.close();
+
         system("cls");
         cout << "Selesai! Anda Baru Saja Menambahkan Buku Kedalam Gudang!\n";
-        cout << "Di Gudang Sekarang Berisi " << count << " Judul Buku!\n";
-        cout << "-\n";
+        cout << "Di Gudang Sekarang Berisi " << count << " Judul Buku!\n"; // + 1 karena count masih menghitung file yang sblm masuk ke rekursi, setelah masuk karna blm return atau masuk rekursi lagi, datanya blm ke update 
         system("pause");
-        fileInput.close();
-        fileCheck.close();
         return;
     }
 
-    system("cls");
-    cout << "Masukkan ID Buku: ";
-    cin >> daftarBuku[tambahBuku].idBuku;
+    bool sudahAda = false;
+
+    while(!sudahAda){
+        system("cls");
+        cout << "Masukkan ID Buku: ";
+        cin >> idTemp;
+    
+        for(int i = 0; i < jumlahBuku; i++){
+            if(daftarBuku[i].idBuku == idTemp){
+                sudahAda = true;
+            }
+        }
+        if(sudahAda){
+            cout << "ID Buku Sudah Ada!\n";
+            cout << "Gunakan Setelah " << idTemp << "!\n";
+            system("pause");
+            sudahAda = false;
+        }else{
+            break;
+        }
+    }
 
     cout << "Masukkan Judul Buku: ";
     cin.ignore();
-    getline(cin, daftarBuku[tambahBuku].judulBuku);
-    judulTemp = (daftarBuku[tambahBuku].judulBuku); 
-    judulTemp = spaceToUnderscore(judulTemp);
+
+    //anjay bisa, kalo judul ada, tinggal nambah stok
+    getline(cin, judulTemp);
+    judulTemp = EditUpLowCase(judulTemp);
+
+    for(int i = 0; i < jumlahBuku; i++){
+        if(judulTemp == daftarBuku[i].judulBuku){
+            ofstream fileTrunc(fileListBuku, ios::trunc);
+            cout << "Tambah Stok Buku: ";
+            cin >> stokTemp;
+            daftarBuku[i].stok += stokTemp;
+                for(int j = 0; j < jumlahBuku; j++){
+                    fileTrunc << daftarBuku[j].idBuku << ' ' << spaceToUnderscore(daftarBuku[j].judulBuku) << ' ' << spaceToUnderscore(daftarBuku[j].genre) << ' ' << spaceToUnderscore(daftarBuku[j].authorBuku) << ' ' << spaceToUnderscore(daftarBuku[j].penerbitBuku) << ' ' << daftarBuku[j].tahunTerbit << ' ' << daftarBuku[j].harga << ' ' << daftarBuku[j].stok << '\n';
+                }
+                cout << "Anda Berhasil Menambahkan Stok ke Buku " << daftarBuku[i].judulBuku << " Menjadi " << daftarBuku[i].stok << "!\n";
+                system("pause");
+                fileTrunc.close();
+                fileInput.close();
+                return;
+        }
+    }
 
     cout << "Masukkan Genre Buku: ";
     getline(cin, daftarBuku[tambahBuku].genre);
@@ -542,51 +574,28 @@ void addBook(int tambahBuku){
     cin >> daftarBuku[tambahBuku].tahunTerbit;
     cout << "Masukkan Harga Buku: ";
     cin >> daftarBuku[tambahBuku].harga;
-    cout << "Masukkan Stok Buku: ";
+
+    cout << "Masukkan Jumlah Stok: ";
     cin >> daftarBuku[tambahBuku].stok;
-    fileInput << daftarBuku[tambahBuku].idBuku << ' ' << judulTemp << ' ' << genreTemp << ' ' << authorTemp << ' ' << penerbitTemp << ' ' << daftarBuku[tambahBuku].tahunTerbit << ' ' << daftarBuku[tambahBuku].harga << ' ' << daftarBuku[tambahBuku].stok << '\n';
+
+    fileInput << idTemp << ' ' << spaceToUnderscore(judulTemp) << ' ' << genreTemp << ' ' << authorTemp << ' ' << penerbitTemp << ' ' << daftarBuku[tambahBuku].tahunTerbit << ' ' << daftarBuku[tambahBuku].harga << ' ' << daftarBuku[tambahBuku].stok << '\n';
     system("cls");
-    return addBook(tambahBuku - 1);
+
+    // masukkin ke struct array, biar kebaca data barunya. karna ini rekursi dan fileLoader ada di Menu, jadi tidak terbaca kalau tidak ditambahkan ke struct array dulu
+    daftarBuku[jumlahBuku].idBuku = idTemp;
+    daftarBuku[jumlahBuku].judulBuku = judulTemp;
+    daftarBuku[jumlahBuku].genre = genreTemp;
+    daftarBuku[jumlahBuku].authorBuku = authorTemp;
+    daftarBuku[jumlahBuku].penerbitBuku = penerbitTemp;
+    daftarBuku[jumlahBuku].tahunTerbit = daftarBuku[tambahBuku].tahunTerbit;
+    daftarBuku[jumlahBuku].harga = daftarBuku[tambahBuku].harga;
+    daftarBuku[jumlahBuku].stok = daftarBuku[tambahBuku].stok;
+
+    return addBook(tambahBuku - 1, jumlahBuku + 1);
 }
 
-void sortingBuku() {
-    buku daftarBuku[kapasitasBuku];
-    int x = 0;
-    
-    ifstream Database(fileListBuku);
-    if (!Database.is_open()) {
-        cout << "File Error!\n";
-        system("pause");
-        return;
-    }
-    
-    string idTemp, judulTemp, genreTemp, authorTemp, penerbitTemp, tahunTemp, hargaTemp, stokTemp;
-    int hargaInt, stokInt;
-    
-    while(Database >> idTemp >> judulTemp >> genreTemp >> authorTemp >> penerbitTemp >> tahunTemp >> hargaTemp >> stokTemp){
-        judulTemp = UnderscoreToSpace(judulTemp);
-        genreTemp = UnderscoreToSpace(genreTemp);
-        authorTemp = UnderscoreToSpace(authorTemp);
-        penerbitTemp = UnderscoreToSpace(penerbitTemp);
-        daftarBuku[x].idBuku = idTemp;
-        daftarBuku[x].judulBuku = judulTemp;
-        daftarBuku[x].genre = genreTemp;
-        daftarBuku[x].authorBuku = authorTemp;
-        daftarBuku[x].penerbitBuku = penerbitTemp;
-        daftarBuku[x].tahunTerbit = tahunTemp;
-        hargaInt = stoi(hargaTemp);
-        daftarBuku[x].harga = hargaInt;
-        stokInt = stoi(stokTemp);
-        daftarBuku[x].stok = stokInt;
-        x++;
-    }
-    Database.close();
+void sortingBuku(int jumlahBuku){
 
-    if(x == 0){
-        cout << "Tidak Ada Data Untuk Diurutkan!\n";
-        system("pause");
-        return;
-    }
     int pil = 0;
     while(pil != 3){
         bool swap = false;
@@ -600,8 +609,8 @@ void sortingBuku() {
     
         switch(pil){
             case 1:
-                for(int i = 0; i < x - 1;i++){
-                    for(int j = 0 ; j < x - i - 1; j++){
+                for(int i = 0; i < jumlahBuku - 1;i++){
+                    for(int j = 0 ; j < jumlahBuku - i - 1; j++){
                         bool tukar = false;
                         if(daftarBuku[j].judulBuku > daftarBuku[j+1].judulBuku){
                             tukar = true;
@@ -616,8 +625,8 @@ void sortingBuku() {
                 swap = true;
             break;
             case 2:
-                for(int i = 0; i < x - 1;i++){
-                    for(int j = 0 ; j < x - i - 1; j++){
+                for(int i = 0; i < jumlahBuku - 1;i++){
+                    for(int j = 0 ; j < jumlahBuku - i - 1; j++){
                         bool tukar = false;
                         if(daftarBuku[j].harga > daftarBuku[j+1].harga){
                             tukar = true;
@@ -641,7 +650,7 @@ void sortingBuku() {
         }
         if(swap){
             ofstream SaveFile(fileListBuku, ios::trunc);
-            for(int i = 0; i < x; i++){
+            for(int i = 0; i < jumlahBuku; i++){
                 SaveFile << daftarBuku[i].idBuku << " " << spaceToUnderscore(daftarBuku[i].judulBuku) << " " << spaceToUnderscore(daftarBuku[i].genre) << " " 
                 << spaceToUnderscore(daftarBuku[i].authorBuku) << " " << spaceToUnderscore(daftarBuku[i].penerbitBuku)<< " " <<
                 daftarBuku[i].tahunTerbit << " " << daftarBuku[i].harga << " " << daftarBuku[i].stok << '\n';
@@ -681,6 +690,7 @@ void OutputForSort(){
         cout << '\n';
         i++;
     }
+
     Database.close();
 }
 
@@ -780,18 +790,20 @@ string UnderscoreToSpace(string str){
 }
 
 string EditUpLowCase(string str){
-    bool newWord = true;
-    for(char &lw : str){
-        lw = tolower(lw);
+    bool newWord = true; // apakah awal kata baru
+
+    for(char &lw : str){ // loop mengubah semua char di str menjadi kecil , // : adalah range-based loop, melakukan penguilangan untuk setiap elemen str
+        lw = tolower(lw); // mengubah char yang ada di variabel lw menjadi kecil
     }
 
-    for (char &up : str){
-        if(isspace(up)){
-            newWord = true;
-        }else if (newWord) {
-            up = toupper(up);
-            newWord = false;
+    for(char &up : str){
+        if(isspace(up)){ // cek apakah char tersebut merupakan spasi, jika iya, next char bakal kapital
+            newWord = true; // setelah spasi adalah awal kata baru
+        }else if(newWord){ // dan jika new word, char selanjutnya setelah spasi
+            up = toupper(up); // mengubah char yang ada di variabel up menjadi kapital
+            newWord = false; // setelah diubah artinya, next char bukan kapital
         }
     }
+
     return str;
 }
